@@ -81,7 +81,7 @@ export default function GoalsPage() {
     const outerRadius = radius;
     const innerRadius = radius / 2;
     let rot = (Math.PI / 2) * 3;
-    let step = Math.PI / spikes;
+    const step = Math.PI / spikes;
 
     ctx.moveTo(x, y - outerRadius);
     for (let i = 0; i < spikes; i++) {
