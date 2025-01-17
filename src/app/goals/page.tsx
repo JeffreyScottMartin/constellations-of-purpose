@@ -82,6 +82,9 @@ export default function GoalsPage() {
       );
       rot += step;
     }
+    if (brightness === 0) {
+      brightness = 0.1;
+    }
     ctx.lineTo(x, y - outerRadius);
     ctx.closePath();
     ctx.fillStyle = `rgba(255, 255, 0, ${brightness})`;
@@ -117,7 +120,7 @@ export default function GoalsPage() {
                 }}
                 width={200}
                 height={200}
-                className="w-full h-48 object-cover"
+                className="w-full h-auto object-cover bg-slate-950"
               ></canvas>
               <div className="p-4">
                 <h2 className="text-lg font-semibold text-gray-800">
