@@ -1,8 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { use } from "react";
+import { useRouter, useParams } from "next/navigation";
 
 interface Task {
   name: string;
@@ -16,42 +15,71 @@ interface Goal {
   completed: boolean;
 }
 
-export default function GoalPage({
-  params,
-}: {
-  params: Promise<{ goal: string }>;
-}) {
-  const unwrappedParams = use(params);
+export default function GoalPage() {
   const [goal, setGoal] = useState<Goal | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [taskName, setTaskName] = useState("");
   const router = useRouter();
+  const params = useParams();
+  const goalId = params?.goal as string; // Get the 'goal' parameter from URL
 
   useEffect(() => {
-    const fetchGoal = async () => {
+    const fetchGoal = () => {
       const savedGoals = localStorage.getItem("goals");
       if (savedGoals) {
         const goals = JSON.parse(savedGoals) as Goal[];
-        const currentGoal = goals.find((g) => g.id === unwrappedParams.goal);
+        console.log("Goals in storage:", goals); // Debug log
+        console.log("Looking for goal ID:", goalId); // Debug log
+
+        const currentGoal = goals.find((g) => g.id === goalId);
         if (currentGoal) {
+          console.log("Found goal:", currentGoal); // Debug log
           setGoal(currentGoal);
         } else {
-          console.error("Goal not found");
+          console.error(`Goal not found with ID: ${goalId}`);
+          router.push("/goals");
         }
       } else {
         console.error("No goals found in localStorage");
+        router.push("/goals");
       }
-      setLoading(false);
     };
 
     fetchGoal();
-  }, [unwrappedParams.goal]);
+  }, [goalId]);
 
-  const handleAddTask = () => {
-    const taskName = prompt("What is the task?");
-    if (taskName && goal) {
+  useEffect(() => {
+    const savedGoals = localStorage.getItem("goals");
+    if (savedGoals) {
+      const goals = JSON.parse(savedGoals) as Goal[];
+      const currentGoal = goals.find((g) => g.id === goalId);
+      if (currentGoal) {
+        setGoal(currentGoal);
+      } else {
+        console.error("Goal not found");
+        router.push("/goals");
+      }
+    } else {
+      console.error("No goals found in localStorage");
+      router.push("/goals");
+    }
+  }, [goalId, router]);
+
+  const handleAddTask = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && taskName && goal) {
       const newTask = { name: taskName, completed: false };
-      const updatedGoal = { ...goal, tasks: [...goal.tasks, newTask] };
-      updateGoal(updatedGoal);
+      const updatedTasks = [...goal.tasks, newTask];
+      const updatedGoal = { ...goal, tasks: updatedTasks };
+      setGoal(updatedGoal);
+      setTaskName("");
+      // Update the goal in localStorage
+      const savedGoals = localStorage.getItem("goals");
+      if (savedGoals) {
+        const goals = JSON.parse(savedGoals);
+        const updatedGoals = goals.map((g: Goal) =>
+          g.id === goal.id ? updatedGoal : g
+        );
+        localStorage.setItem("goals", JSON.stringify(updatedGoals));
+      }
     }
   };
 
@@ -60,53 +88,35 @@ export default function GoalPage({
       const updatedTasks = goal.tasks.map((task, index) =>
         index === taskIndex ? { ...task, completed: !task.completed } : task
       );
-      const allTasksCompleted = updatedTasks.every((task) => task.completed);
-      const updatedGoal = {
-        ...goal,
-        tasks: updatedTasks,
-        completed: allTasksCompleted,
-      };
-      updateGoal(updatedGoal);
-    }
-  };
-
-  const updateGoal = (updatedGoal: Goal) => {
-    const savedGoals = localStorage.getItem("goals");
-    if (savedGoals) {
-      const goals = JSON.parse(savedGoals) as Goal[];
-      const updatedGoals = goals.map((g) =>
-        g.id === updatedGoal.id ? updatedGoal : g
-      );
-      localStorage.setItem("goals", JSON.stringify(updatedGoals));
+      const updatedGoal = { ...goal, tasks: updatedTasks };
       setGoal(updatedGoal);
+      // Update the goal in localStorage
+      const savedGoals = localStorage.getItem("goals");
+      if (savedGoals) {
+        const goals = JSON.parse(savedGoals);
+        const updatedGoals = goals.map((g: Goal) =>
+          g.id === goal.id ? updatedGoal : g
+        );
+        localStorage.setItem("goals", JSON.stringify(updatedGoals));
+      }
     }
   };
-
-  if (loading) return <div>Loading...</div>;
 
   if (!goal) {
-    return (
-      <div>
-        <h1 className="text-2xl font-bold mb-4">No goal found</h1>
-        <button
-          className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
-          onClick={() => router.push("/")}
-        >
-          Back to Home
-        </button>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">{goal.name}</h1>
-      <button
-        className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
-        onClick={handleAddTask}
-      >
-        Add Task
-      </button>
+      <input
+        type="text"
+        value={taskName}
+        onChange={(e) => setTaskName(e.target.value)}
+        onKeyDown={handleAddTask}
+        className="w-full p-2 border text-black border-gray-300 rounded mb-4"
+        placeholder="Enter task name and press Enter"
+      />
       <ul className="list-disc pl-6">
         {goal.tasks.map((task, index) => (
           <li key={index} className="mb-2">
