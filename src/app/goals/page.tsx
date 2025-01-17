@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import AddGoalButton from "@/app/ui/addGoalButton";
 
 interface Task {
   name: string;
@@ -24,21 +25,6 @@ export default function GoalsPage() {
       setGoals(JSON.parse(savedGoals));
     }
   }, []);
-
-  const handleAddGoal = () => {
-    const name = prompt("What is your goal?");
-    if (name) {
-      const newGoal = {
-        id: Date.now().toString(),
-        name,
-        tasks: [],
-        completed: false,
-      };
-      const updatedGoals = [newGoal, ...goals];
-      setGoals(updatedGoals);
-      localStorage.setItem("goals", JSON.stringify(updatedGoals));
-    }
-  };
 
   const calculateCompletionPercentage = (tasks: Task[]) => {
     if (tasks.length === 0) return 0;
@@ -98,7 +84,7 @@ export default function GoalsPage() {
     }
     ctx.lineTo(x, y - outerRadius);
     ctx.closePath();
-    ctx.fillStyle = `rgba(255, 255, 0, ${Math.max(brightness, 0.1)})`;
+    ctx.fillStyle = `rgba(255, 255, 0, ${brightness})`;
     ctx.fill();
   };
 
@@ -109,11 +95,16 @@ export default function GoalsPage() {
           My Constellations
         </h1>
         <button
-          className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
-          onClick={handleAddGoal}
+          className="bg-red-500 text-white px-4 py-2 rounded-md mb-4 ml-4"
+          onClick={() => {
+            localStorage.removeItem("goals");
+            setGoals([]);
+            window.location.href = "/";
+          }}
         >
-          Add Goal
+          Clear Universe
         </button>
+        <AddGoalButton goals={goals} setGoals={setGoals} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {goals.map((goal) => (
             <div
@@ -126,7 +117,7 @@ export default function GoalsPage() {
                 }}
                 width={200}
                 height={200}
-                className="w-full h-60 h-min-60 bg-black object-cover"
+                className="w-full h-48 object-cover"
               ></canvas>
               <div className="p-4">
                 <h2 className="text-lg font-semibold text-gray-800">
