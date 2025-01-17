@@ -77,18 +77,20 @@ export default function AddGoalButton({
   return (
     <>
       <button
-        className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
+        className="bg-amber-500 font-bold text-zinc-950 px-4 py-2 rounded-md mb-4"
         onClick={() => setIsModalOpen(true)}
       >
-        Add Goal
+        Add Constellation
       </button>
 
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="fixed inset-0 flex items-center justify-center bg-zinc-950/80">
+          <div className="bg-zinc-950 p-6 rounded-lg shadow-lg border border-amber-500">
             {!currentGoalId ? (
               <>
-                <h2 className="text-2xl font-bold mb-4">Add New Goal</h2>
+                <h2 className="text-xl text-white font-bold mb-4">
+                  Add a New Constellation
+                </h2>
                 <input
                   type="text"
                   value={newGoalName}
@@ -104,16 +106,18 @@ export default function AddGoalButton({
                     Cancel
                   </button>
                   <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    className="bg-amber-500 text-zinc-950 font-bold px-4 py-2 rounded"
                     onClick={handleAddGoal}
                   >
-                    Add Goal
+                    Add Constellation
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <h2 className="text-2xl font-bold mb-4">Add Tasks to Goal</h2>
+                <h2 className="text-xl text-white font-bold mb-4">
+                  Add tasks required to complete the constellation
+                </h2>
                 <input
                   type="text"
                   value={newTaskName}
@@ -122,14 +126,14 @@ export default function AddGoalButton({
                   placeholder="Enter task name"
                 />
                 <button
-                  className="bg-green-500 text-white px-4 py-2 rounded mb-4"
+                  className="bg-amber-500 text-zinc-950 px-4 py-2 rounded mb-4"
                   onClick={handleAddTask}
                 >
                   Add Task
                 </button>
                 <ul className="list-disc pl-5 mb-4">
                   {tasks.map((task, index) => (
-                    <li key={index} className="text-gray-800">
+                    <li key={index} className="text-amber-500/60">
                       {task.name}
                     </li>
                   ))}
@@ -146,10 +150,10 @@ export default function AddGoalButton({
                     Cancel
                   </button>
                   <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    className="bg-amber-500 text-zinc-950 px-4 py-2 rounded font-bold"
                     onClick={handleSaveTasks}
                   >
-                    Save Tasks
+                    Create Constellation
                   </button>
                 </div>
               </>

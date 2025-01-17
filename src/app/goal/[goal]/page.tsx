@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { GiStarFormation } from "react-icons/gi";
 
 interface Task {
   name: string;
@@ -139,24 +140,42 @@ export default function GoalPage() {
     canvas.width = 400;
     canvas.height = 400;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw goal star in the center
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const goalBrightness = goal.completed ? 1 : 0.5;
-    drawStar(ctx, centerX, centerY, 40, 5, 20, goalBrightness);
-
-    // Draw task stars orbiting the goal star
+    let animationFrameId: number;
     const orbitRadius = 100;
-    goal.tasks.forEach((task, index) => {
-      const angle = (2 * Math.PI * index) / goal.tasks.length;
-      const x = centerX + orbitRadius * Math.cos(angle);
-      const y = centerY + orbitRadius * Math.sin(angle);
-      const taskBrightness = task.completed ? 1 : 0.1;
-      drawStar(ctx, x, y, 20, 5, 10, taskBrightness);
-    });
+    let angleOffset = 0;
+
+    const render = () => {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate goal brightness based on task completion
+      const completedTasks = goal.tasks.filter((task) => task.completed).length;
+      const totalTasks = goal.tasks.length;
+      const goalBrightness = totalTasks > 0 ? completedTasks / totalTasks : 0.1;
+
+      // Draw goal star in the center
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      drawStar(ctx, centerX, centerY, 40, 5, 20, goalBrightness);
+
+      // Draw task stars orbiting the goal star
+      goal.tasks.forEach((task, index) => {
+        const angle = (2 * Math.PI * index) / goal.tasks.length + angleOffset;
+        const x = centerX + orbitRadius * Math.cos(angle);
+        const y = centerY + orbitRadius * Math.sin(angle);
+        const taskBrightness = task.completed ? 1 : 0.1;
+        drawStar(ctx, x, y, 20, 5, 10, taskBrightness);
+      });
+
+      angleOffset += 0.01;
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [goal]);
 
   if (isLoading) {
@@ -182,55 +201,79 @@ export default function GoalPage() {
   }
 
   return (
-    <div>
-      <div className="w-full max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">{goal.name}</h1>
-
-        <div className="mb-8">
-          <canvas
-            ref={canvasRef}
-            className="w-full h-auto object-cover bg-slate-950"
-            width="400"
-            height="400"
-          />
-        </div>
-        <div className="flex mb-4">
-          <input
-            type="text"
-            value={taskName}
-            onChange={(e) => setTaskName(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="w-full p-2 border text-black border-gray-300 rounded-l mb-4"
-            placeholder="Enter task name and press Enter"
-          />
+    <section className="w-full h-min-screen p-5">
+      <div className="w-full sm:w-8/12 mb-2">
+        <div className="container mx-auto h-full">
+          <nav className="flex px-4 justify-start items-center">
+            <GiStarFormation className="text-2xl md:text-4xl text-amber-500 mr-4" />
+            <h1 className="text-2xl md:text-4xl font-bold">
+              Constellations of Purpose<span className="text-amber-500">.</span>
+            </h1>
+          </nav>
           <button
-            className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+            className="mt-4 bg-amber-500 text-zinc-950 font-bold px-4 py-2 rounded ml-2"
             onClick={() => router.push("/goals")}
           >
-            Return to Goals
-          </button>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-r"
-            onClick={handleAddTask}
-          >
-            Add Task
+            Return to Constellations
           </button>
         </div>
-        <ul className="list-disc pl-6">
-          {goal.tasks.map((task, index) => (
-            <li key={index} className="mb-2 flex items-center">
-              <input
-                type="checkbox"
-                checked={task.completed}
-                onChange={() => handleToggleTaskCompletion(index)}
-              />
-              <span className={task.completed ? "line-through" : ""}>
-                {task.name}
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
-    </div>
+
+      <div className="relative flex flex-col items-center mx-auto lg:flex-row-reverse lg:max-w-5xl lg:mt-2 xl:max-w-6xl">
+        <div className="w-full h-64 lg:w-1/2 lg:h-auto">
+          <canvas
+            ref={canvasRef}
+            className="w-full h-auto object-cover"
+            width="300"
+            height="300"
+          />
+        </div>
+        <div className="max-w-lg bg-zinc-950/60 rounded-lg border border-amber-500 md:max-w-2xl md:z-10 md:shadow-lg md:absolute md:top-0 md:mt-48 lg:w-3/5 lg:left-0 lg:mt-20 lg:ml-20 xl:mt-24 xl:ml-12">
+          <div className="flex flex-col p-12 md:px-16">
+            <h2 className="text-lg font-bold text-amber-500">{goal.name}</h2>
+            <div className="mt-2">
+              <ul className="list-disc pl-6">
+                {goal.tasks.map((task, index) => (
+                  <li key={index} className="flex items-center text-md">
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => handleToggleTaskCompletion(index)}
+                    />
+                    <span
+                      className={
+                        task.completed
+                          ? "line-through ml-4 text-amber-500/40 text-md"
+                          : "ml-4 text-amber-500"
+                      }
+                    >
+                      {task.name}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="mt-2">
+              <div className="flex mb-4">
+                <input
+                  type="text"
+                  value={taskName}
+                  onChange={(e) => setTaskName(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full p-2 border text-black border-gray-300 rounded-lg"
+                  placeholder="Enter new tasks."
+                />
+              </div>
+              <button
+                className="bg-amber-500 text-zinc-950 font-bold px-4 py-2 rounded-lg"
+                onClick={handleAddTask}
+              >
+                Add Task
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
