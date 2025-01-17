@@ -2,7 +2,9 @@
 
 Constellations of Purpose is a personal goal management tool that helps you visualize and achieve your dreams. Create goals, break them down into manageable tasks, and watch as your progress lights up the sky.
 
-## Entry for the GitHub Copilot 1 Day coding challenge
+## Entry for the GitHub Copilot 1 Day coding challenge Demo Link
+
+[https://constellations-of-purpose.vercel.app/](https://constellations-of-purpose.vercel.app/)
 
 ## Prompt: New Beginnings
 
@@ -25,7 +27,6 @@ Constellations of Purpose is a personal goal management tool that helps you visu
 
 1. Clone the repository:
 
-```sh
 git clone https://github.com/JeffreyScottMartin/constellations-of-purpose.git
 
 cd constellations-of-purpose
@@ -34,6 +35,7 @@ pnpm dev
 pnpm build
 pnpm start
 
+```sh
 ├── .gitignore
 ├── .next/
 ├── eslint.config.mjs
@@ -58,20 +60,26 @@ pnpm start
 │   │   └── TaskModal.tsx
 ├── tailwind.config.ts
 └── tsconfig.json
+```
 
-Components
-GoalsPage
+# Components
+
+## GoalsPage
+
 The main page for managing goals. Displays a list of goals and allows users to add new goals.
 
-GoalPage
+## GoalPage
+
 The page for managing tasks within a specific goal. Allows users to add tasks and mark them as completed.
 
-AddGoalButton
+## AddGoalButton
+
 A button component for adding new goals.
 
-TaskModal
+## TaskModal
+
 A modal component for adding and updating tasks within a goal.
 
-License
+## License
+
 This project is licensed under the MIT License.
-```
