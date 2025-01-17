@@ -2,7 +2,9 @@
 
 Constellations of Purpose is a personal goal management tool that helps you visualize and achieve your dreams. Create goals, break them down into manageable tasks, and watch as your progress lights up the sky.
 
-## Entry for the GitHub Copilot 1 Day coding challenge
+## Entry for the GitHub Copilot 1 Day coding challenge Demo Link
+
+https://constellations-of-purpose.vercel.app/
 
 ## Prompt: New Beginnings
 
