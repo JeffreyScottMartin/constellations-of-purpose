@@ -126,7 +126,7 @@ export default function GoalPage({
       )}
       <button
         className="bg-red-600 px-4 py-2 rounded-md mt-4"
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/goals")}
       >
         Back to Home
       </button>

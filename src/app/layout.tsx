@@ -1,6 +1,14 @@
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
 export const metadata = {
   title: "Constellations of Purpose",
-  description: "Visualize your goals and tasks as constellations.",
+  description: "Coming Soon",
 };
 
 export default function RootLayout({
@@ -10,13 +18,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-dark text-white">
-        <header className="p-4 bg-black shadow-md">
-          <h1 className="text-2xl font-bold text-center">
-            Constellations of Purpose
-          </h1>
-        </header>
-        <main className="p-6">{children}</main>
+      <body className={`${inter.variable} antialiased`}>
+        <main className="p-6 flex justify-center w-full max-w-full overflow-hidden">
+          {children}
+        </main>
       </body>
     </html>
   );
