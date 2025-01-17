@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Task {
   name: string;
@@ -17,6 +17,7 @@ interface Goal {
 
 export default function HomePage() {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     const savedGoals = localStorage.getItem("goals");
@@ -24,6 +25,12 @@ export default function HomePage() {
       setGoals(JSON.parse(savedGoals));
     }
   }, []);
+
+  useEffect(() => {
+    if (goals.length > 0) {
+      router.push("/goals");
+    }
+  }, [goals, router]);
 
   const handleAddGoal = () => {
     const name = prompt("What is your goal?");
@@ -40,35 +47,19 @@ export default function HomePage() {
     }
   };
 
-  const calculateCompletionPercentage = (tasks: Task[]) => {
-    if (tasks.length === 0) return 0;
-    const completedTasks = tasks.filter((task) => task.completed).length;
-    return Math.round((completedTasks / tasks.length) * 100);
-  };
+  if (goals.length === 0) {
+    return (
+      <div>
+        <h1 className="text-2xl font-bold mb-4">Get Started</h1>
+        <button
+          className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
+          onClick={handleAddGoal}
+        >
+          Add Goal
+        </button>
+      </div>
+    );
+  }
 
-  return (
-    <div>
-      <button
-        className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
-        onClick={handleAddGoal}
-      >
-        Add Goal
-      </button>
-      <ul className="list-disc pl-6">
-        {goals.map((goal) => (
-          <li key={goal.id} className="mb-2">
-            <Link href={`/goal/${goal.id}`}>{goal.name}</Link>
-            {goal.tasks.length === 0 && (
-              <div className="text-red-500">
-                No tasks yet. Add tasks to strive for this goal!
-              </div>
-            )}
-            <div>
-              {calculateCompletionPercentage(goal.tasks)}% of tasks completed
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+  return null;
 }
