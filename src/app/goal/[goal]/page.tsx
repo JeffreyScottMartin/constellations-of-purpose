@@ -4,10 +4,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { use } from "react";
 
+interface Task {
+  name: string;
+  completed: boolean;
+}
+
 interface Goal {
   id: string;
   name: string;
-  tasks: string[];
+  tasks: Task[];
+  completed: boolean;
 }
 
 export default function GoalPage({
@@ -41,18 +47,38 @@ export default function GoalPage({
   }, [unwrappedParams.goal]);
 
   const handleAddTask = () => {
-    const task = prompt("What is the task?");
-    if (task && goal) {
-      const updatedGoal = { ...goal, tasks: [...goal.tasks, task] };
-      const savedGoals = localStorage.getItem("goals");
-      if (savedGoals) {
-        const goals = JSON.parse(savedGoals) as Goal[];
-        const updatedGoals = goals.map((g) =>
-          g.id === goal.id ? updatedGoal : g
-        );
-        localStorage.setItem("goals", JSON.stringify(updatedGoals));
-        setGoal(updatedGoal);
-      }
+    const taskName = prompt("What is the task?");
+    if (taskName && goal) {
+      const newTask = { name: taskName, completed: false };
+      const updatedGoal = { ...goal, tasks: [...goal.tasks, newTask] };
+      updateGoal(updatedGoal);
+    }
+  };
+
+  const handleToggleTaskCompletion = (taskIndex: number) => {
+    if (goal) {
+      const updatedTasks = goal.tasks.map((task, index) =>
+        index === taskIndex ? { ...task, completed: !task.completed } : task
+      );
+      const allTasksCompleted = updatedTasks.every((task) => task.completed);
+      const updatedGoal = {
+        ...goal,
+        tasks: updatedTasks,
+        completed: allTasksCompleted,
+      };
+      updateGoal(updatedGoal);
+    }
+  };
+
+  const updateGoal = (updatedGoal: Goal) => {
+    const savedGoals = localStorage.getItem("goals");
+    if (savedGoals) {
+      const goals = JSON.parse(savedGoals) as Goal[];
+      const updatedGoals = goals.map((g) =>
+        g.id === updatedGoal.id ? updatedGoal : g
+      );
+      localStorage.setItem("goals", JSON.stringify(updatedGoals));
+      setGoal(updatedGoal);
     }
   };
 
@@ -84,10 +110,20 @@ export default function GoalPage({
       <ul className="list-disc pl-6">
         {goal.tasks.map((task, index) => (
           <li key={index} className="mb-2">
-            {task}
+            <input
+              type="checkbox"
+              checked={task.completed}
+              onChange={() => handleToggleTaskCompletion(index)}
+            />
+            <span className={task.completed ? "line-through" : ""}>
+              {task.name}
+            </span>
           </li>
         ))}
       </ul>
+      {goal.completed && (
+        <div className="text-green-500 font-bold mt-4">Goal Completed!</div>
+      )}
       <button
         className="bg-red-600 px-4 py-2 rounded-md mt-4"
         onClick={() => router.push("/")}

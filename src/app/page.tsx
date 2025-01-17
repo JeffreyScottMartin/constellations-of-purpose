@@ -3,10 +3,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+interface Task {
+  name: string;
+  completed: boolean;
+}
+
 interface Goal {
   id: string;
   name: string;
-  tasks: string[];
+  tasks: Task[];
+  completed: boolean;
 }
 
 export default function HomePage() {
@@ -22,32 +28,47 @@ export default function HomePage() {
   const handleAddGoal = () => {
     const name = prompt("What is your goal?");
     if (name) {
-      const newGoal = { id: Date.now().toString(), name, tasks: [] };
+      const newGoal = {
+        id: Date.now().toString(),
+        name,
+        tasks: [],
+        completed: false,
+      };
       const updatedGoals = [...goals, newGoal];
       setGoals(updatedGoals);
       localStorage.setItem("goals", JSON.stringify(updatedGoals));
     }
   };
 
+  const calculateCompletionPercentage = (tasks: Task[]) => {
+    if (tasks.length === 0) return 0;
+    const completedTasks = tasks.filter((task) => task.completed).length;
+    return Math.round((completedTasks / tasks.length) * 100);
+  };
+
   return (
     <div>
       <button
-        className="bg-star text-black px-4 py-2 rounded-md mb-4"
+        className="bg-blue-500 text-black px-4 py-2 rounded-md mb-4"
         onClick={handleAddGoal}
       >
-        Add New Goal
+        Add Goal
       </button>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <ul className="list-disc pl-6">
         {goals.map((goal) => (
-          <Link
-            key={goal.id}
-            href={`/${goal.id}`}
-            className="p-4 bg-gray-800 rounded-lg shadow-md hover:shadow-xl"
-          >
-            <h2 className="text-lg font-bold">{goal.name}</h2>
-          </Link>
+          <li key={goal.id} className="mb-2">
+            <Link href={`/goal/${goal.id}`}>{goal.name}</Link>
+            {goal.tasks.length === 0 && (
+              <div className="text-red-500">
+                No tasks yet. Add tasks to strive for this goal!
+              </div>
+            )}
+            <div>
+              {calculateCompletionPercentage(goal.tasks)}% of tasks completed
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
